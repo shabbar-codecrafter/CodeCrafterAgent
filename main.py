@@ -1,6 +1,13 @@
 import time
 import asyncio
 import os
+import sys
+
+# Force UTF-8 encoding for stdout/stderr to prevent ASCII encoding errors
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+if sys.stderr.encoding != 'utf-8':
+    sys.stderr.reconfigure(encoding='utf-8', errors='ignore')
 
 # Filter GRPC/ABSL logs before imports
 os.environ["GRPC_VERBOSITY"] = "ERROR"

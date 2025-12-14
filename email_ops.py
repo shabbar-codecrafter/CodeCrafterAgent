@@ -8,10 +8,10 @@ from bs4 import BeautifulSoup
 
 class EmailClient:
     def __init__(self):
-        self.email_addr = os.getenv("EMAIL_ADDR")
+        self.email_addr = os.getenv("EMAIL_USER") or os.getenv("EMAIL_ADDR")
         self.email_pass = os.getenv("EMAIL_PASS")
-        self.imap_server = "imap.gmail.com"
-        self.smtp_server = "smtp.gmail.com"
+        self.imap_server = os.getenv("IMAP_SERVER", "imap.gmail.com")
+        self.smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
 
     def connect_imap(self):
         mail = imaplib.IMAP4_SSL(self.imap_server)
@@ -46,13 +46,17 @@ class EmailClient:
             for part in msg.walk():
                 content_type = part.get_content_type()
                 if content_type == "text/plain":
-                    return part.get_payload(decode=True).decode()
+                    payload = part.get_payload(decode=True)
+                    return payload.decode('utf-8', errors='ignore') if payload else ""
                 elif content_type == "text/html":
-                    html = part.get_payload(decode=True).decode()
-                    soup = BeautifulSoup(html, "html.parser")
-                    return soup.get_text()
+                    payload = part.get_payload(decode=True)
+                    if payload:
+                        html = payload.decode('utf-8', errors='ignore')
+                        soup = BeautifulSoup(html, "html.parser")
+                        return soup.get_text()
         else:
-            return msg.get_payload(decode=True).decode()
+            payload = msg.get_payload(decode=True)
+            return payload.decode('utf-8', errors='ignore') if payload else ""
         return ""
 
     def check_emails(self):
