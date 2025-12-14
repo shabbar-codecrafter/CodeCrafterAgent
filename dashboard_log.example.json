@@ -1,0 +1,16 @@
+[
+    {
+        "ticket_id": "TICKET-20250101-001",
+        "subject": "Fix Header Alignment",
+        "status": "COMPLETED",
+        "pr_link": "https://github.com/user/repo/pull/1",
+        "timestamp": "2025-01-01T10:05:00"
+    },
+    {
+        "ticket_id": "TICKET-20250101-002",
+        "subject": "Drop Database Table",
+        "status": "BLOCKED",
+        "pr_link": null,
+        "timestamp": "2025-01-01T11:00:00"
+    }
+]
