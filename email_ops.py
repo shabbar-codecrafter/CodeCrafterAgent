@@ -8,8 +8,14 @@ from bs4 import BeautifulSoup
 
 class EmailClient:
     def __init__(self):
-        self.email_addr = os.getenv("EMAIL_USER") or os.getenv("EMAIL_ADDR")
-        self.email_pass = os.getenv("EMAIL_PASS")
+        # Get credentials and sanitize them (remove non-ASCII characters)
+        email_addr = os.getenv("EMAIL_USER") or os.getenv("EMAIL_ADDR")
+        email_pass = os.getenv("EMAIL_PASS")
+
+        # Clean credentials: replace non-breaking spaces and encode/decode to remove non-ASCII
+        self.email_addr = email_addr.encode('ascii', 'ignore').decode('ascii').strip() if email_addr else None
+        self.email_pass = email_pass.encode('ascii', 'ignore').decode('ascii').strip() if email_pass else None
+
         self.imap_server = os.getenv("IMAP_SERVER", "imap.gmail.com")
         self.smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
 
