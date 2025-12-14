@@ -2,12 +2,22 @@ import time
 import asyncio
 import os
 import sys
+import io
 
 # Force UTF-8 encoding for stdout/stderr to prevent ASCII encoding errors
-if sys.stdout.encoding != 'utf-8':
-    sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
-if sys.stderr.encoding != 'utf-8':
-    sys.stderr.reconfigure(encoding='utf-8', errors='ignore')
+# Try multiple methods for compatibility
+try:
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8', errors='ignore')
+        sys.stderr.reconfigure(encoding='utf-8', errors='ignore')
+    else:
+        # Fallback for older Python versions
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='ignore')
+except Exception as e:
+    # If all else fails, set the default encoding
+    import locale
+    locale.setlocale(locale.LC_ALL, '')
 
 # Filter GRPC/ABSL logs before imports
 os.environ["GRPC_VERBOSITY"] = "ERROR"
@@ -525,8 +535,10 @@ def main():
                     continue
 
         except Exception as e:
+            import traceback
             print(f"Critical error in poll loop: {e}")
-        
+            traceback.print_exc()
+
         time.sleep(10)
 
 if __name__ == "__main__":
